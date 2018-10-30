@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="board">
+
+	<!-- 게시판 전체 정보 출력 -->
+	<select id="selectBoard" resultType="boardVo">
+		select * from board
+		order by
+		board_no
+	</select>
+	
+	<select id="PostBoardCnt" parameterType="int" resultType="int">
+		select count(*) from post
+		where post_board = #{board_no}
+	</select>
+
+	<select id="selectPostBoardList" parameterType="pageVo" resultType="postVo">
+		<!-- select * from post where post_board = #{board_no} -->
+
+		select * from (
+		select rownum rnum , a.*
+		from
+		(SELECT post_no, LPAD('└ ', 3*(LEVEL-1),'　') || post_title
+		post_title,
+		post_context, post_rmv, post_date, post_board, post_pid, post_user
+		FROM post
+		where post_board = #{board_no}
+		START WITH post_pid IS NULL
+		CONNECT BY
+		PRIOR post_no = post_pid) a)
+		where rnum between #{page}*#{pageSize}-(#{pageSize}-1) and (#{page}*#{pageSize})
+
+	</select>
+
+
+	<!-- 사용여부가 Y인 정보 출력 -->
+	<select id="selectUseBoard" resultType="boardVo">
+		select * from board
+		where
+		board_use = 'Y'
+		order by board_no
+	</select>
+
+
+	<!-- 게시판 목록 추가 -->
+	<insert id="insertBoard" parameterType="boardVo">
+		insert into board
+		values
+		(board_no_SEQ.NEXTVAL,#{board_name}, #{board_use}, #{board_user},
+		sysdate)
+	</insert>
+
+	<insert id="insertPostNo" parameterType="postVo">
+		insert into post
+		values
+		(post_no_SEQ.NEXTVAL , #{post_title}, #{post_context}, 'N', sysdate,
+		#{post_board},'',#{post_user})
+	</insert>
+	
+	<!-- 게시글 목록 추가 -->
+	<insert id="insertPost" parameterType="postVo">
+		<selectKey keyProperty="post_no" resultType="int" order="BEFORE">
+			select post_no_SEQ.NEXTVAL from dual
+		</selectKey>
+		insert into post
+		values
+		(#{post_no}, #{post_title}, #{post_context}, 'N', sysdate,
+		#{post_board},${post_pid},#{post_user})
+	</insert>
+
+	<!-- 게시글 번호에 따른 하나의 게시글 정보 조회 -->
+	<select id="selectOnePost" parameterType="int" resultType="postVo">
+		select *
+		from post
+		where post_no = #{post_no}
+	</select>
+
+	<insert id="insertComment" parameterType="commentVo">
+		insert into commentary
+		values
+		(comm_no_SEQ.NEXTVAL, #{comm_context}, sysdate, 'N',
+		#{comm_post}, #{comm_user})
+		
+	</insert>
+
+
+	<select id="selectPostComment" parameterType="int" resultType="commentVo">
+		select *
+		from commentary
+		where comm_post= #{comm_post}
+	</select>
+	<!-- <update id="updateUser" parameterType="userVo"> update jspuser <trim 
+		prefix="SET" suffixOverrides=","> <if test="pass != null"> pass = #{pass},</if> 
+		<if test="name != null"> name = #{name},</if> <if test="addr1 != null"> addr1 
+		= #{addr1},</if> <if test="addr2 != null"> addr2 = #{addr2},</if> <if test="zipcd 
+		!= null"> zipcd = #{zipcd],</if> <if test="email != null"> email = #{email},</if> 
+		<if test="tel != null"> tel = #{tel},</if> <if test="birth != null"> birth 
+		= #{birth},</if> <if test="profile != null"> profile = #{profile}</if> </trim> 
+		where userId = #{userId} </update> -->
+
+	<!-- 게시글 수정 -->
+	<update id="updatePost" parameterType="postVo">
+		update post
+		set post_title
+		= #{post_title}
+		, post_context = #{post_context}
+		where post_no = #{post_no}
+	</update>
+
+	<!-- 게시글 삭제 -->
+	<update id="deletePost" parameterType="int">
+		update post
+		set post_rmv =
+		'Y'
+		where post_no = #{post_no}
+	</update>
+
+	<!-- 게시판 사용여부 -->
+	<update id="updateBoard" parameterType="boardVo">
+		update board
+		set
+		<if test="board_name != null">
+			board_name = #{board_name},
+		</if>
+		board_use = #{board_use}
+		where board_no = #{board_no}
+	</update>
+	
+	
+	<insert id="insertFile" parameterType="attachVo">
+		insert into attachments
+		values(attach_no_SEQ.NEXTVAL,#{attach_name}, #{attach_post})	
+	</insert>
+	
+	<update id="updateFile" parameterType="attachVo">
+		update attachments
+		set attach_name = #{attach_name}
+		where attach_no = #{attach_no}
+	</update>
+
+	<select id="selectAttachment" parameterType="int" resultType="attachVo">
+		select * from attachments
+		where attach_post = #{post_no}
+	</select>
+</mapper>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<properties resource="kr/or/ddit/db/db.properties"/>
+	
+	<typeAliases>
+		<typeAlias type="kr.or.ddit.user.model.UserVo" alias="userVo"/>
+		<typeAlias type="kr.or.ddit.board.model.BoardVo" alias="boardVo"/>
+		<typeAlias type="kr.or.ddit.board.model.PostVo" alias="postVo"/>
+		<typeAlias type="kr.or.ddit.board.model.CommentVo" alias="commentVo"/>
+		<typeAlias type="kr.or.ddit.board.model.PageVo" alias="pageVo"/>
+		<typeAlias type="kr.or.ddit.board.model.AttachmentsVo" alias="attachVo"/>
+	</typeAliases>
+	
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="${db.driver}" />
+				<property name="url" value="${db.url}" />
+				<property name="username" value="${db.username}" />
+				<property name="password" value="${db.password}" />
+			</dataSource> 
+			<!-- <dataSource type="JNDI">
+				<property name="data_source" value="java:comp/env/jdbc/oracleDB" />
+			</dataSource> -->
+		</environment>
+	</environments>
+	<mappers>
+		<!-- 실제 쿼리문을 작성하는 xml이 발생할 때마다 등록해줘야 한다. 까먹으면 안돼!! -->
+		<mapper resource="kr/or/ddit/db/user.xml" />
+		<mapper resource="kr/or/ddit/db/board.xml" />
+	
+		
+	</mappers>
+</configuration>
