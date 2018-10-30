@@ -38,6 +38,7 @@ public class LogoutServlet extends HttpServlet {
 		//session 무효화
 		session.invalidate();
 		
+		//sss
 		//로그아웃을 누르면 처음 로그인 페이지로 이동한다.
 		//처음 설정을 
 		response.sendRedirect("/board/login.jsp");

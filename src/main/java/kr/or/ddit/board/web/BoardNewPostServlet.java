@@ -60,7 +60,7 @@ public class BoardNewPostServlet extends HttpServlet {
 		
 		String path = getServletContext().getRealPath("/profile");
 //		postAttach.write( "D:\\A_TeachingMaterial\\6.JspSrpgin\\upload\\" + fileName);
-
+		//ssss
 		AttachmentsVo attchVo = new AttachmentsVo();
 		attchVo.setAttach_post(postNo);
 		if(fileName.equals("")){
